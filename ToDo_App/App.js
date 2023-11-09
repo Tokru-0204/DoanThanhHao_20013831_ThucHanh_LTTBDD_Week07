@@ -119,7 +119,6 @@ function API_Screen_02({ route, navigation }) {
   const [deleteItemIndex, setDeleteItemIndex] = useState(-1);
   const [newItemName, setNewItemName] = useState("");
 
-
   useEffect(() => {
     fetch("https://654098fa45bedb25bfc22468.mockapi.io/ToDo_App")
       .then((response) => response.json())
@@ -132,42 +131,39 @@ function API_Screen_02({ route, navigation }) {
       })
       .catch((error) => console.error("Lỗi khi lấy dữ liệu:", error));
   }, [userEmail]);
-  
+
   const updateItemName = () => {
     if (editedItemIndex !== -1) {
       const updatedData = [...userPlan];
       const userId = user;
-      console.log("userId:", userId);
-  
+      //console.log("userId:", userId);
+
       const updatedJobIndex = updatedData.findIndex(
         (job) => job.id_plan === updatedData[editedItemIndex].id_plan
       );
-  
+
       // console.log("updatedData:", updatedData);
       // console.log("updatedJobIndex:", updatedJobIndex);
-  
+
       if (updatedData[updatedJobIndex].job === newItemName) {
         setEditedItemIndex(-1);
         setNewItemName("");
         return;
       }
-  
+
       updatedData[updatedJobIndex].job = newItemName;
-  
-      console.log("Updated job:", newItemName);
-  
-      fetch(
-        `https://654098fa45bedb25bfc22468.mockapi.io/ToDo_App/${userId}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            plan: updatedData, 
-          }),
-        }
-      )
+
+      // console.log("Updated job:", newItemName);
+
+      fetch(`https://654098fa45bedb25bfc22468.mockapi.io/ToDo_App/${userId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          plan: updatedData,
+        }),
+      })
         .then((response) => {
           if (!response || !response.ok) {
             const status = response ? response.status : "unknown";
@@ -185,37 +181,36 @@ function API_Screen_02({ route, navigation }) {
         });
     }
   };
-  
-  
-  
-  
-  
-  const deleteItem = (index) => {
-    if (index !== -1) {
-      const itemToDelete = userPlan[index];
-  
-      // Xóa mục khỏi API
-      fetch(
-        `https://654098fa45bedb25bfc22468.mockapi.io/ToDo_App/${itemToDelete.id_plan}`,
-        {
-          method: "DELETE",
+
+  const deleteJob = (jobId) => {
+    const UserId = user;
+    const updatedData = [...userPlan];
+    updatedData.splice(jobId, 1);
+
+    fetch(`https://654098fa45bedb25bfc22468.mockapi.io/ToDo_App/${UserId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        plan: updatedData,
+      }),
+    })
+      .then((response) => {
+        if (!response || !response.ok) {
+          const status = response ? response.status : "unknown";
+          throw new Error(`HTTP error! Status: ${status}`);
         }
-      )
-        .then(() => {
-          // Cập nhật trạng thái dữ liệu sau khi xóa thành công
-          const updatedData = [...userPlan];
-          updatedData.splice(index, 1);
-          setUserPlan(updatedData);
-        })
-        .catch((error) => {
-          console.error("Lỗi khi xóa mục:", error);
-        });
-    }
+        return response.json();
+      })
+      .then(() => {
+        // Update the React state with the modified data
+        setUserPlan(updatedData);
+      })
+      .catch((error) => {
+        console.error("Error deleting job:", error);
+      });
   };
-  
-  
-  
-  
 
   return (
     <View style={styles.container}>
@@ -236,8 +231,7 @@ function API_Screen_02({ route, navigation }) {
             alignItems: "center",
           }}
         >
-         
-         {editedItemIndex === index ? (
+          {editedItemIndex === index ? (
             <View
               style={{
                 flex: 1,
@@ -251,7 +245,7 @@ function API_Screen_02({ route, navigation }) {
                 value={newItemName}
                 onChangeText={(text) => setNewItemName(text)}
               />
-              <TouchableOpacity onPress={() => deleteItem(index)}>
+              <TouchableOpacity onPress={() => deleteJob(index)}>
                 <Image
                   source={require("./assets/delete.png")}
                   style={{ width: 20, height: 20 }}
