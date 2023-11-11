@@ -8,10 +8,14 @@ import {
   TextInput,
   TouchableOpacity,
   FlatList,
+  ScrollView,
+  Platform,
+  RadioButton,
 } from "react-native";
 import React, { useState, useEffect, useCallback } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
+import CheckBox from "@react-native-community/checkbox";
 
 function API_Screen_01({ navigation }) {
   const [user, setuser] = useState([]);
@@ -115,6 +119,7 @@ function API_Screen_02({ route, navigation }) {
   const { userEmail } = route.params;
   const [userPlan, setUserPlan] = useState([]);
   const [user, setUser] = useState();
+  const [data, setData] = useState([]);
   const [editedItemIndex, setEditedItemIndex] = useState(-1);
   const [deleteItemIndex, setDeleteItemIndex] = useState(-1);
   const [newItemName, setNewItemName] = useState("");
@@ -125,6 +130,7 @@ function API_Screen_02({ route, navigation }) {
       .then((data) => {
         const user = data.find((user) => user.email === userEmail);
         setUser(user.id);
+        setData(user);
         if (user) {
           setUserPlan(user.plan);
         }
@@ -211,94 +217,215 @@ function API_Screen_02({ route, navigation }) {
         console.error("Error deleting job:", error);
       });
   };
+  const loadData = async () => {
+    try {
+      const response = await fetch(
+        `https://654098fa45bedb25bfc22468.mockapi.io/ToDo_App`
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch data");
+      }
+      const data = await response.json();
+      const user = data.find((user) => user.email === userEmail);
+
+      if (user) {
+        setUserPlan(user.plan);
+        setUser(user);
+      }
+    } catch (error) {
+      console.error("Lỗi khi tải dữ liệu:", error);
+    }
+  };
+  useEffect(() => {
+    const unsubscribe = navigation.addListener(
+      "focus",
+      () => {
+        loadData();
+      },
+      [userEmail]
+    );
+    return unsubscribe;
+  }, [navigation]);
+
+  const Item = ({ job }) => (
+    <View>
+      <Text>{job}</Text>
+    </View>
+  );
+  const handleRadioToggle = (index) => {
+    const updatedUserPlan = [...userPlan];
+    updatedUserPlan[index].status = !updatedUserPlan[index].status;
+    setUserPlan(updatedUserPlan);
+  };
 
   return (
     <View style={styles.container}>
-      {userPlan.map((item, index) => (
-        <View
-          key={item.id_plan}
-          style={{
-            flex: 1,
-            paddingTop: 13,
-            height: 48,
-            width: 335,
-            backgroundColor: "#DEE1E6",
-            borderRadius: 20,
-            paddingHorizontal: 15,
-            marginBottom: 10,
-            paddingRight: 59,
-            flexDirection: "row",
-            alignItems: "center",
-          }}
-        >
-          {editedItemIndex === index ? (
-            <View
-              style={{
-                flex: 1,
-                flexDirection: "row",
-                alignItems: "center",
-                paddingLeft: 100,
-              }}
-            >
-              <TextInput
-                style={{ flex: 1 }}
-                value={newItemName}
-                onChangeText={(text) => setNewItemName(text)}
-              />
-              <TouchableOpacity onPress={() => deleteJob(index)}>
-                <Image
-                  source={require("./assets/delete.png")}
-                  style={{ width: 20, height: 20 }}
-                />
-              </TouchableOpacity>
-              <TouchableOpacity onPress={updateItemName}>
-                <Image
-                  source={require("./assets/save.png")}
-                  style={{ width: 20, height: 20 }}
-                />
-              </TouchableOpacity>
-            </View>
-          ) : (
-            <View
-              style={{ flex: 1, flexDirection: "row", alignItems: "center" }}
-            >
-              <Text style={{ fontWeight: "bold", fontSize: 16, flex: 1 }}>
-                {item.job}
-              </Text>
-              <TouchableOpacity onPress={() => setEditedItemIndex(index)}>
-                <Image
-                  source={require("./assets/edit.png")}
-                  style={{ width: 20, height: 20 }}
-                />
-              </TouchableOpacity>
-            </View>
-          )}
+      <View style={{ flex: 2.5, flexDirection: "row", alignItems: "center" }}>
+        <TouchableOpacity onPress={() => navigation.navigate("API_Screen_01")}>
+          <Image
+            source={require("./assets/back.png")}
+            style={{ width: 20, height: 20 }}
+          />
+        </TouchableOpacity>
+        <View style={{ paddingLeft: 50 }}>
+          <Image
+            source={{ uri: data?.image }}
+            style={{ width: 100, height: 100, borderRadius: 100 / 2 }}
+          />
         </View>
-      ))}
+      </View>
+      <ScrollView style={{ height: 200 }}>
+        {userPlan.map((item, index) => (
+          <View
+            key={item.id_plan}
+            style={{
+              flex: 1,
+              height: 48,
+              width: 335,
+              backgroundColor: "#DEE1E6",
+              borderRadius: 24,
+              paddingHorizontal: 15,
+              marginBottom: 10,
+              paddingRight: 59,
+              flexDirection: "row",
+              alignItems: "center",
+              shadowColor: "#000",
+              shadowOffset: {
+                width: 0,
+                height: 3,
+              },
+              shadowOpacity: 0.1,
+              shadowRadius: 5,
+              elevation: 5,
+            }}
+          >
+            {editedItemIndex === index ? (
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  paddingLeft: 100,
+                }}
+              >
+                <TextInput
+                  style={{ flex: 1 }}
+                  value={newItemName}
+                  onChangeText={(text) => setNewItemName(text)}
+                />
+                <TouchableOpacity onPress={() => deleteJob(index)}>
+                  <Image
+                    source={require("./assets/delete.png")}
+                    style={{ width: 20, height: 20 }}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={updateItemName}>
+                  <Image
+                    source={require("./assets/save.png")}
+                    style={{ width: 20, height: 20 }}
+                  />
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <View
+                style={{
+                  flex: 3.5,
+                  flexDirection: "row",
+                  alignItems: "center",
+                }}
+              >
+                {/* <CheckBox
+                  value={item.status}
+                  onValueChange={() => handleCheckBoxToggle(index)}
+                ></CheckBox> */}
+                {/* <RadioButton
+                  value={item.status}
+                  status={item.status ? "checked" : "unchecked"}
+                  onPress={() => handleRadioToggle(index)}
+                /> */}
+
+                {item.status ? (
+                  <Image source={require("./assets/check_true.png")} style={{width:20,height:20}} />
+                ) : (
+                  <Image source={require("./assets/check_false.png")} style={{width:20,height:20}} />
+                )}
+                <Item job={item.job} />
+                <TouchableOpacity onPress={() => setEditedItemIndex(index)}>
+                  <Image
+                    source={require("./assets/edit.png")}
+                    style={{ width: 20, height: 20 }}
+                  />
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
+        ))}
+      </ScrollView>
+      <TouchableOpacity
+        style={{ flex: 2, flexDirection: "row", alignItems: "center" }}
+        onPress={() =>
+          navigation.navigate("API_Screen_03", { userEmail: userEmail })
+        }
+      >
+        <Image
+          source={require("./assets/add.png")}
+          style={{ width: 40, height: 40 }}
+        />
+      </TouchableOpacity>
     </View>
   );
 }
-
-function API_Screen_03({ navigation }) {
+function API_Screen_03({ navigation, route }) {
   const [newItemName, setNewItemName] = useState("");
-  const [data, setData] = useState([]);
+  const [userPlan, setUserPlan] = useState([]);
+  const [user, setUser] = useState();
+  const { userEmail } = route.params; // Extracting userEmail from the route params
+  const reloadUserData = async () => {
+    try {
+      const response = await fetch(
+        "https://654098fa45bedb25bfc22468.mockapi.io/ToDo_App"
+      );
 
+      if (!response.ok) {
+        throw new Error("Failed to fetch data");
+      }
+
+      const data = await response.json();
+      const user = data.find((user) => user.email === userEmail);
+
+      if (user) {
+        setUserPlan(user.plan);
+        setUser(user);
+      }
+    } catch (error) {
+      console.error("Lỗi khi tải dữ liệu:", error);
+    }
+  };
+
+  // useEffect(() => {
+  //   // Load dữ liệu khi màn hình được tạo ra hoặc mỗi khi userEmail thay đổi
+  //   reloadUserData();
+  // }, [userEmail]);
   const addItem = async () => {
     try {
-      if (newItemName !== "") {
+      if (newItemName.trim() !== "") {
         const newItem = {
-          plan: newItemName,
+          status: "true",
+          job: newItemName,
+          id_plan: String(userPlan.length), // Sử dụng độ dài mảng plan để tạo id mới
         };
 
-        // Thêm mục vào API
         const response = await fetch(
-          "https://654098fa45bedb25bfc22468.mockapi.io/ToDo_App",
+          `https://654098fa45bedb25bfc22468.mockapi.io/ToDo_App/${user.id}`, // Updated this line
           {
-            method: "POST",
+            method: "PUT", // Changed method to PUT since you're updating an existing resource
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify(newItem),
+            body: JSON.stringify({
+              ...user, // Updated this line
+              plan: [...user.plan, newItem], // Thêm mục mới vào mảng plan
+            }),
           }
         );
 
@@ -306,43 +433,40 @@ function API_Screen_03({ navigation }) {
           throw new Error("Failed to add item");
         }
 
-        const responseData = await response.json();
-
         // Cập nhật trạng thái dữ liệu sau khi thêm thành công
-        setData((prevData) => [...prevData, responseData]);
+        setUserPlan((prevData) => {
+          const updatedUserPlan = prevData.map((u) => {
+            if (u.email === userEmail) {
+              return {
+                ...u,
+                plan: [...u.plan, newItem],
+              };
+            }
+            return u;
+          });
+          return updatedUserPlan;
+        });
+
         setNewItemName("");
 
+        // Load lại dữ liệu từ API để cập nhật dữ liệu mới nhất
+        reloadUserData();
+
         // Chuyển hướng sau khi cập nhật dữ liệu
+        navigation.navigate("API_Screen_02", { userEmail: userEmail });
       }
     } catch (error) {
       console.error("Lỗi khi thêm mục:", error);
     }
-    navigation.navigate("API_Screen_02");
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(
-          "https://654098fa45bedb25bfc22468.mockapi.io/ToDo_App"
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch data");
-        }
-
-        const json = await response.json();
-        setData(json);
-      } catch (error) {
-        console.error("Lỗi khi tải dữ liệu:", error);
-      }
-    };
-
-    fetchData();
-  }, []);
-
+    // Load dữ liệu khi màn hình được tạo ra hoặc mỗi khi userEmail thay đổi
+    reloadUserData();
+  }, [userEmail]);
   return (
-    <View style={styles.container}>
+    <View>
+      {/* Add your JSX for rendering components */}
       <TextInput
         style={{
           height: 40,
