@@ -230,7 +230,8 @@ function API_Screen_02({ route, navigation }) {
 
       if (user) {
         setUserPlan(user.plan);
-        setUser(user);
+        setUser(user.id);
+        setData(user);
       }
     } catch (error) {
       console.error("Lỗi khi tải dữ liệu:", error);
@@ -270,7 +271,7 @@ function API_Screen_02({ route, navigation }) {
         <View style={{ paddingLeft: 50 }}>
           <Image
             source={{ uri: data?.image }}
-            style={{ width: 100, height: 100, borderRadius: 100 / 2 }}
+            style={{ width: 100, height: 100, borderRadius: 100 / 2, resizeMode: 'cover', }}
           />
         </View>
       </View>
