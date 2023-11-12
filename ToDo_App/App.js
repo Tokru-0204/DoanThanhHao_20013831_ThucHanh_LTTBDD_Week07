@@ -65,7 +65,7 @@ function API_Screen_01({ navigation }) {
             height: 43,
             borderWidth: 1,
             borderRadius: 12,
-            borderColor: "#9095A0",
+            // borderColor: "#9095A0",
             paddingLeft: 35,
           }}
           onChangeText={(text) => setEmail(text)}
@@ -105,7 +105,7 @@ function API_Screen_01({ navigation }) {
             textAlign: "center",
           }}
         >
-          Go to Screen 02
+          GET STARTED ->
         </Text>
       </TouchableOpacity>
       <View>
@@ -261,26 +261,86 @@ function API_Screen_02({ route, navigation }) {
 
   return (
     <View style={styles.container}>
-      <View style={{ flex: 2.5, flexDirection: "row", alignItems: "center" }}>
-        <TouchableOpacity onPress={() => navigation.navigate("API_Screen_01")}>
+      <View style={{ flex: 2, flexDirection: "row", alignItems: "center" }}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("API_Screen_01")}
+          style={{ paddingRight: 20, paddingLeft: 10, paddingTop: 10 }}
+        >
           <Image
             source={require("./assets/back.png")}
-            style={{ width: 20, height: 20 }}
+            style={{ width: 22, height: 22 }}
           />
         </TouchableOpacity>
-        <View style={{ paddingLeft: 50 }}>
-          <Image
-            source={{ uri: data?.image }}
-            style={{ width: 100, height: 100, borderRadius: 100 / 2, resizeMode: 'cover', }}
-          />
+        <View style={{ flex: 1, flexDirection: "row" }}>
+          <View style={{ flex: 1, paddingLeft: 80 }}>
+            <Image
+              source={{ uri: data?.image }}
+              style={{
+                width: 80,
+                height: 80,
+                borderRadius: 80 / 2,
+                resizeMode: "cover",
+              }}
+            />
+          </View>
+          <View styles={{ flex: 1 }}>
+            <Text
+              style={{
+                fontSize: 20,
+                color: "#9095A0, #DEE1E6 17%",
+                fontWeight: "bold",
+                paddingLeft: 22,
+                paddingTop: 17,
+              }}
+            >
+              Hi {data?.user_Name}
+            </Text>
+            <Text
+              style={{
+                fontSize: 14,
+                fontWeight: 700,
+                fontFamily: "Epilogue",
+                textAlign: "center",
+                color: "#171A1F",
+                opacity: 0.75,
+                paddingLeft: 10,
+              }}
+            >
+              Have agrate day a head
+            </Text>
+          </View>
         </View>
       </View>
-      <ScrollView style={{ height: 200 }}>
+
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          borderWidth: 1,
+          borderColor: "gray",
+          borderRadius: 5,
+          marginBottom: 60,
+          width: 335,
+          height: 44,
+        }}
+      >
+        <Image
+          source={require("./assets/search.png")}
+          style={{ width: 22, height: 22, marginRight: 10, marginLeft: 10 }}
+        />
+        <TextInput
+          style={{ flex: 1, height: 44, width: 335, borderRadius: 4 }}
+          placeholder="Search"
+          // onChangeText={(text) => setSearchText(text)}
+          // value={searchText}
+        />
+      </View>
+      <ScrollView style={{ height: 290 }}>
         {userPlan.map((item, index) => (
           <View
             key={item.id_plan}
             style={{
-              flex: 1,
+              // flex: 1,
               height: 48,
               width: 335,
               backgroundColor: "#DEE1E6",
@@ -320,7 +380,10 @@ function API_Screen_02({ route, navigation }) {
                     style={{ width: 20, height: 20 }}
                   />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={updateItemName}>
+                <TouchableOpacity
+                  onPress={updateItemName}
+                  style={{ paddingLeft: 7 }}
+                >
                   <Image
                     source={require("./assets/save.png")}
                     style={{ width: 20, height: 20 }}
@@ -330,9 +393,8 @@ function API_Screen_02({ route, navigation }) {
             ) : (
               <View
                 style={{
-                  flex: 3.5,
+                  flex: 1,
                   flexDirection: "row",
-                  alignItems: "center",
                 }}
               >
                 {/* <CheckBox
@@ -344,33 +406,65 @@ function API_Screen_02({ route, navigation }) {
                   status={item.status ? "checked" : "unchecked"}
                   onPress={() => handleRadioToggle(index)}
                 /> */}
+                <View
+                  style={{
+                    flex: 1,
+                    flexDirection: "row",
+                    justifyContent: "flẽx-start",
+                  }}
+                >
+                  {item.status ? (
+                    <Image
+                      source={require("./assets/check_true.png")}
+                      style={{ width: 20, height: 20 }}
+                    />
+                  ) : (
+                    <Image
+                      source={require("./assets/check_false.png")}
+                      style={{ width: 20, height: 20 }}
+                    />
+                  )}
 
-                {item.status ? (
-                  <Image source={require("./assets/check_true.png")} style={{width:20,height:20}} />
-                ) : (
-                  <Image source={require("./assets/check_false.png")} style={{width:20,height:20}} />
-                )}
-                <Item job={item.job} />
-                <TouchableOpacity onPress={() => setEditedItemIndex(index)}>
-                  <Image
-                    source={require("./assets/edit.png")}
-                    style={{ width: 20, height: 20 }}
-                  />
-                </TouchableOpacity>
+                  <View style={{ paddingLeft: 8 }}>
+                    <Item style={{}} job={item.job} />
+                  </View>
+                </View>
+                <View
+                  style={{
+                    flex: 1,
+                    flexDirection: "row",
+                    justifyContent: "flex-end",
+                  }}
+                >
+                  <TouchableOpacity
+                    onPress={() => setEditedItemIndex(index)}
+                    style={{ marginRight: -30 }}
+                  >
+                    <Image
+                      source={require("./assets/edit.png")}
+                      style={{ width: 20, height: 20 }}
+                    />
+                  </TouchableOpacity>
+                </View>
               </View>
             )}
           </View>
         ))}
       </ScrollView>
       <TouchableOpacity
-        style={{ flex: 2, flexDirection: "row", alignItems: "center" }}
+        style={{
+          flex: 2,
+          flexDirection: "row",
+          alignItems: "center",
+          marginTop: -15,
+        }}
         onPress={() =>
           navigation.navigate("API_Screen_03", { userEmail: userEmail })
         }
       >
         <Image
           source={require("./assets/add.png")}
-          style={{ width: 40, height: 40 }}
+          style={{ width: 55, height: 55 }}
         />
       </TouchableOpacity>
     </View>
@@ -466,28 +560,112 @@ function API_Screen_03({ navigation, route }) {
     reloadUserData();
   }, [userEmail]);
   return (
-    <View>
-      {/* Add your JSX for rendering components */}
-      <TextInput
-        style={{
-          height: 40,
-          width: 335,
-          backgroundColor: "#DEE1E6",
-          borderRadius: 20,
-          paddingHorizontal: 15,
-          marginBottom: 10,
-          paddingRight: 59,
-        }}
-        placeholder="Enter new item name"
-        onChangeText={(text) => setNewItemName(text)}
-        value={newItemName}
-      />
-      <TouchableOpacity onPress={addItem}>
-        <Image
-          source={require("./assets/add.png")}
-          style={{ width: 20, height: 20 }}
-        />
-      </TouchableOpacity>
+    <View style={styles.container}>
+      <View style={{ flex: 2, flexDirection: "row", alignItems: "center" }}>
+        <View style={{ flex: 1, flexDirection: "row", paddingRight: 60 }}>
+          <View style={{ flex: 1, flexDirection: "row" }}>
+            <Image
+              source={{ uri: user?.image }}
+              style={{
+                width: 80,
+                height: 80,
+                borderRadius: 80 / 2,
+                resizeMode: "cover",
+              }}
+            />
+            <View styles={{ flex: 1 }}>
+              <Text
+                style={{
+                  fontSize: 20,
+                  color: "#9095A0, #DEE1E6 17%",
+                  fontWeight: "bold",
+                  paddingLeft: 22,
+                  paddingTop: 17,
+                }}
+              >
+                Hi {user?.user_Name}
+              </Text>
+              <Text
+                style={{
+                  fontSize: 14,
+                  fontWeight: 700,
+                  fontFamily: "Epilogue",
+                  textAlign: "center",
+                  color: "#171A1F",
+                  opacity: 0.75,
+                  paddingLeft: 10,
+                }}
+              >
+                Have agrate day a head
+              </Text>
+            </View>
+          </View>
+        </View>
+        <TouchableOpacity
+          onPress={() =>
+            navigation.navigate("API_Screen_02", { userEmail: userEmail })
+          }
+          style={{ paddingRight: 10, paddingLeft: 10, paddingTop: 10 }}
+        >
+          <Image
+            source={require("./assets/back.png")}
+            style={{ width: 22, height: 22 }}
+          />
+        </TouchableOpacity>
+      </View>
+
+      <View style={{ flex: 8, justifyContent: "center", alignItems: "center" }}>
+        <View style={{ flex: 1.5 }}>
+          <Text
+            style={{
+              fontFamily: "Epilogue",
+              fontWeight: 700,
+              fontSize: 32,
+              lineHeight: 48,
+              textAlign: "center",
+            }}
+          >
+            ADD YOUR JOB
+          </Text>
+        </View>
+        <View style={{ flex: 1.5, marginRight:40, marginTop:-20}}>
+          <TextInput
+            style={{
+              height: 44,
+              width: 335,
+              marginLeft: 40,
+              borderWidth:1,
+              borderRadius: 4,
+              paddingLeft: 40,
+              borderColor: "#9095A0",
+            }}
+            placeholder="input your job"
+            onChangeText={(text) => setNewItemName(text)}
+            value={newItemName}
+          ></TextInput>
+          <Image
+            source={require("./assets/add_icon.png")}
+            style={{
+              width: 24,
+              height: 24,
+              position: "absolute",
+              marginLeft: 50,
+              top:10
+            }}
+          />
+        </View>
+        <View style={{ flex: 1.5 }}>
+          <TouchableOpacity onPress={addItem} style={{width:190,height:44,backgroundColor:"#00BDD6", borderRadius:12}}>
+            <Text style={{fontFamily:"Inter", fontWeight:400, fontSize:16, lineHeight:26, textAlign:"center",top:10, color:"#FFFFFF"}}>FINISH -></Text>
+          </TouchableOpacity>
+        </View>
+        <View style={{ flex: 3.5 }}>
+          <Image
+            source={require("./assets/book_header.png")}
+            style={{ width: 170, height: 150 }}
+          />
+        </View>
+      </View>
     </View>
   );
 }
